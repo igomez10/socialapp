@@ -1,38 +1,13 @@
 import { signIn, signOut, useSession } from "next-auth/react";
 import Head from "next/head";
-import Link from "next/link";
 import { api } from "~/utils/api";
+import * as User from "../components/User";
 
 // async function waits 1 second and returns "hello"
 async function aw() {
   await new Promise((resolve) => setTimeout(resolve, 1000));
   return "hello";
 }
-
-// server-side rendered
-type User = {
-  id: number;
-  name: string;
-  username: string;
-  email: string;
-  address: {
-    street: string;
-    suite: string;
-    city: string;
-    zipcode: string;
-    geo: {
-      lat: string;
-      lng: string;
-    };
-  };
-  phone: string;
-  website: string;
-  company: {
-    name: string;
-    catchPhrase: string;
-    bs: string;
-  };
-};
 
 export async function getServerSideProps() {
   const hello = await aw();
@@ -42,7 +17,7 @@ export async function getServerSideProps() {
     "https://jsonplaceholder.typicode.com/users"
   );
 
-  const users: User[] = (await usersResponse.json()) as User[];
+  const users: User.APIUser[] = (await usersResponse.json()) as User.APIUser[];
 
   const homeProps: HomeProps = {
     message: hello,
@@ -54,7 +29,7 @@ export async function getServerSideProps() {
 
 type HomeProps = {
   message: string;
-  users: User[];
+  users: User.APIUser[];
 };
 
 export default function Users(props: HomeProps) {
@@ -69,9 +44,10 @@ export default function Users(props: HomeProps) {
       </Head>
       <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#2e026d] to-[#15162c]">
         {/* for each user show name */}
+        <h1> Users</h1>
         {props.users.map((user) => (
           <div key={user.id}>
-            <h1>{user.name}</h1>
+            <User.User props={{ user: user }} />
           </div>
         ))}
       </main>
